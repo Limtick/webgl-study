@@ -13,7 +13,7 @@ import THREEx from '@/utils/THREEx'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import '@/assets/iconfont/material-icons.css'
-import '@/assets/css/custom.less'
+import '@/assets/css/custom.styl'
 Vue.use(MuseUI)
 
 Vue.config.productionTip = false

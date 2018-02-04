@@ -2,6 +2,7 @@ import Body from '@/views/Body'
 import Index from '@/views/Index'
 import Content from '@/views/Content'
 import FirstDemo from '@/views/FirstDemo'
+import AudioVisualizer from '@/views/audioVisualizer/AudioVisualizer'
 import NotFound from '@/views/NotFound'
 
 
@@ -29,6 +30,11 @@ const routes = [
         }
       ]
     }]
+  },
+  {
+    path: '/audioVisualizer',
+    name: 'AudioVisualizer',
+    component: AudioVisualizer
   },
   {
     path: '*',
