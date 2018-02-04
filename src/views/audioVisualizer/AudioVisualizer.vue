@@ -8,9 +8,69 @@
         </div>
 
         <div class="settings-icon-tip" ref="settingsTip" @mouseenter="settingsTipShow = true" @mouseleave="settingsTipShow = false">
-            <mu-icon-button icon="settings"/>
+            <mu-icon-button icon="settings" @click="settingsShow = !settingsShow"/>
             <mu-tooltip label="设置" :show="settingsTipShow" :trigger="$refs.settingsTip" verticalPosition="bottom" horizontalPosition="center"/>
         </div>
+
+        <mu-drawer right :width="300" :open="settingsShow" :docked="false" @close="settingsShow = !settingsShow">
+            <mu-appbar title="设置">
+                <mu-icon-button icon="close" slot="right" @click="settingsShow = false"/>
+            </mu-appbar>
+            <mu-list>
+                <mu-list>
+                    <mu-list-item disableRipple>
+                        <mu-select-field v-model="audioModel" label="显示模式" slot="default">
+                            <mu-menu-item v-for="menu in audioModelDrop" :key="menu.value" :value="menu.value" :title="menu.title" :disabled="menu.disabled"/>
+                        </mu-select-field>
+                    </mu-list-item>
+                </mu-list>
+                <mu-list v-if="audioModel == 1">
+                    <mu-sub-header>直线Line</mu-sub-header>
+                    <mu-list-item disableRipple title="音频方向">
+                        <mu-dropDown-menu :value="lineSettings.direction" :autoWidth="true" @change="handleDirectionChange" slot="after">
+                            <mu-menu-item v-for="menu in lineDirectionDrop" :key="menu.value" :value="menu.value" :title="menu.title"/>
+                        </mu-dropDown-menu>
+                    </mu-list-item>
+                    <mu-list-item disableRipple title="预设">
+                        <mu-dropDown-menu :value="currentSetting" :autoWidth="true" @change="toggleDefaultSetting" slot="after">
+                            <mu-menu-item v-for="(setting, key) in linePreinstallSetting" :key="key" :value="key" :title="setting.name"/>
+                        </mu-dropDown-menu>
+                    </mu-list-item>
+
+                    <mu-list-item disableRipple @click="showAdvanced = !showAdvanced" title="高级设置">
+                        <mu-switch v-model="showAdvanced"  slot="right"/>
+                    </mu-list-item>
+
+                    <template v-if="showAdvanced">
+                        <mu-list-item disableRipple title="采样率">
+                            <mu-slider v-model="lineSettings.frequencies" :min="60" :max="150" slot="default"/>
+                        </mu-list-item>
+                        <mu-list-item disableRipple title="上下间隔">
+                            <mu-slider v-model="lineSettings.lineSpace" :min="0" :max="15" :step="1" slot="default"/>
+                        </mu-list-item>
+                        <mu-list-item disableRipple title="左右间隔">
+                            <mu-slider v-model="lineSettings.rectSpacePercent" :min="0" :max="0.5" :step="0.1" slot="default"/>
+                        </mu-list-item>
+                        <mu-list-item disableRipple title="线宽">
+                            <mu-slider v-model="lineSettings.lineWidth" :min="2" :max="10" :step="1" slot="default"/>
+                        </mu-list-item>
+                        <mu-list-item disableRipple title="线间隔">
+                            <mu-slider v-model="lineSettings.energySpace" :min="1" :max="10" slot="default"/>
+                        </mu-list-item>
+                        <mu-list-item disableRipple title="振幅">
+                            <mu-slider v-model="lineSettings.energyNum" slot="default"/>
+                        </mu-list-item>
+                    </template>
+
+                </mu-list>
+                <mu-list v-else>
+                    <mu-sub-header>圆环Circle</mu-sub-header>
+                    
+                </mu-list>
+                <mu-divider shallowInset/>
+                
+            </mu-list>
+        </mu-drawer>
 
         <canvas ref="audioCanvas" class="audio-canvas" :width="screenWidth" :height="screenHeight"></canvas>
         <canvas ref="bgCanvas" class="bg-canvas" :width="screenWidth" :height="screenHeight"></canvas>
@@ -46,9 +106,25 @@ export default {
             bg: new Image(),
             animationId: null,
 
+            audioModel: 1,
+            audioModelDrop: [
+                {
+                    title: '直线模式',
+                    value: 1,
+                    disabled: false
+                },
+                {
+                    title: '圆环模式',
+                    value: 2,
+                    disabled: true
+                }
+            ],
+
             topPopup: false,
             type: '',
             message: '',
+
+            settingsShow: false,
             musicTipShow: false,
             settingsTipShow: false
         }
@@ -136,8 +212,8 @@ export default {
             // 清理画布
             this.audioCtx.clearRect(0, 0, this.$refs.audioCanvas.width, this.$refs.audioCanvas.height);
 
-            this.audioCtx.strokeStyle = "#00d0ff";
-            this.audioCtx.lineWidth = 2;
+            this.audioCtx.strokeStyle = '#00d0ff';
+            this.audioCtx.lineWidth = this.lineParam.lineWidth;
             
             let dataArray = new Uint8Array(this.analyser.frequencyBinCount);
             this.analyser.getByteFrequencyData(dataArray);
@@ -156,7 +232,8 @@ export default {
                 energyNum,
                 energySpace,
                 baseLine,
-                lineSpace
+                lineSpace,
+                direction
             } = this.lineParam;
 
             for (let i = 0; i < frequencies; i++) {
@@ -166,16 +243,16 @@ export default {
                 let energy = (dataArray[step * i] / 256.0) * energyNum;
                 // 基线
                 // 上半部分
-                this._drawLine(beginX, endX, baseLine - lineSpace);
+                if (direction != 3) this._drawLine(beginX, endX, baseLine - lineSpace);
                 // 下半部分
-                this._drawLine(beginX, endX, baseLine + lineSpace);
+                if (direction != 2) this._drawLine(beginX, endX, baseLine + lineSpace);
                 // 单频率
                 for (let j = 0; j < energy; j++) {
                     let space = energySpace * j;
                     // 上半部分
-                    this._drawLine(beginX, endX, baseLine - lineSpace, space, 1);
+                    if (direction != 3)this._drawLine(beginX, endX, baseLine - lineSpace, space, 1);
                     // 下半部分
-                    this._drawLine(beginX, endX, baseLine + lineSpace, space, -1);
+                    if (direction != 2)this._drawLine(beginX, endX, baseLine + lineSpace, space, -1);
                 }
             }
         },
@@ -231,7 +308,7 @@ export default {
 <style lang="stylus" scoped>
 icon-tip()
     position fixed
-    z-index 10
+    z-index 2
     color #fff
     cursor pointer
 .audio-visualizer {
