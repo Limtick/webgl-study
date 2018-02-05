@@ -10,13 +10,30 @@ import Stats from 'three/examples/js/libs/stats.min'
 // import-loader 解决module依赖全局变量 THREE
 import 'imports-loader?THREE=three!three/examples/js/controls/OrbitControls';
 import THREEx from '@/utils/THREEx'
+
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import '@/assets/iconfont/material-icons.css'
+
+import { Input, Button, ColorPicker } from 'element-ui'
+
 import '@/assets/css/custom.styl'
+
 Vue.use(MuseUI)
 
+let elementComponents = [
+  Input,
+  Button,
+  ColorPicker
+]
+elementComponents.forEach((component) => {
+  Vue.component(component.name, component)
+})
+
+
+
 Vue.config.productionTip = false
+
 window.THREE = THREE
 window.Detector = Detector
 window.Stats = Stats

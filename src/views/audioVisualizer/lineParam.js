@@ -21,6 +21,8 @@ export default {
                 // 上下基线间距
                 lineSpace: 3,
 
+                color: '#00d0ff',
+
                 // 线方向 
                 // 1 → 双向 | 2 → 上 | 3 → 下
                 direction: 1
@@ -61,6 +63,8 @@ export default {
                         lineWidth: 6,
                         // 上下基线间距
                         lineSpace: 6,
+
+                        color: '#00d0ff'
                     }
                 },
                 line: {
@@ -80,6 +84,8 @@ export default {
                         lineWidth: 2,
                         // 上下基线间距
                         lineSpace: 6,
+
+                        color: '#00d0ff'
                     }
                 }
             }
@@ -98,7 +104,6 @@ export default {
             let rectSpace = Math.round(averageWidth * rectSpacePercent);
 
             let baseLine = Math.round(this.$refs.audioCanvas.height / 2);
-            let lineSpace = this.lineSettings.lineSpace;
             
             return {
                 ...this.lineSettings,
@@ -128,6 +133,9 @@ export default {
         },
         toggleDefaultSetting(type) {
             this.currentSetting = type;
+        },
+        handleColorChange(color) {
+            this.lineSettings.color = color;
         }
     },
     mounted () {

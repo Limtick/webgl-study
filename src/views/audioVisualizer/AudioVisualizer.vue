@@ -12,7 +12,7 @@
             <mu-tooltip label="设置" :show="settingsTipShow" :trigger="$refs.settingsTip" verticalPosition="bottom" horizontalPosition="center"/>
         </div>
 
-        <mu-drawer right :width="300" :open="settingsShow" :docked="false" @close="settingsShow = !settingsShow">
+        <mu-drawer class="visualizer-settings" right :width="300" :open="settingsShow" :docked="false" @close="settingsShow = !settingsShow">
             <mu-appbar title="设置">
                 <mu-icon-button icon="close" slot="right" @click="settingsShow = false"/>
             </mu-appbar>
@@ -37,27 +37,37 @@
                         </mu-dropDown-menu>
                     </mu-list-item>
 
+                    <mu-list-item disableRipple title="颜色">
+                        <el-color-picker v-model="lineSettings.color" popper-class="fix-level" size="small" slot="right" @active-change="handleColorChange"></el-color-picker>
+                    </mu-list-item>
+
                     <mu-list-item disableRipple @click="showAdvanced = !showAdvanced" title="高级设置">
                         <mu-switch v-model="showAdvanced"  slot="right"/>
                     </mu-list-item>
 
                     <template v-if="showAdvanced">
                         <mu-list-item disableRipple title="采样率">
+                            <mu-badge :content="lineSettings.frequencies" primary slot="after"/>
                             <mu-slider v-model="lineSettings.frequencies" :min="60" :max="150" slot="default"/>
                         </mu-list-item>
                         <mu-list-item disableRipple title="上下间隔">
+                            <mu-badge :content="lineSettings.lineSpace" primary slot="after"/>
                             <mu-slider v-model="lineSettings.lineSpace" :min="0" :max="15" :step="1" slot="default"/>
                         </mu-list-item>
                         <mu-list-item disableRipple title="左右间隔">
+                            <mu-badge :content="lineSettings.rectSpacePercent" primary slot="after"/>
                             <mu-slider v-model="lineSettings.rectSpacePercent" :min="0" :max="0.5" :step="0.1" slot="default"/>
                         </mu-list-item>
                         <mu-list-item disableRipple title="线宽">
+                            <mu-badge :content="lineSettings.lineWidth" primary slot="after"/>
                             <mu-slider v-model="lineSettings.lineWidth" :min="2" :max="10" :step="1" slot="default"/>
                         </mu-list-item>
                         <mu-list-item disableRipple title="线间隔">
+                            <mu-badge :content="lineSettings.energySpace" primary slot="after"/>
                             <mu-slider v-model="lineSettings.energySpace" :min="1" :max="10" slot="default"/>
                         </mu-list-item>
                         <mu-list-item disableRipple title="振幅">
+                            <mu-badge :content="lineSettings.energyNum" primary slot="after"/>
                             <mu-slider v-model="lineSettings.energyNum" slot="default"/>
                         </mu-list-item>
                     </template>
@@ -212,7 +222,7 @@ export default {
             // 清理画布
             this.audioCtx.clearRect(0, 0, this.$refs.audioCanvas.width, this.$refs.audioCanvas.height);
 
-            this.audioCtx.strokeStyle = '#00d0ff';
+            this.audioCtx.strokeStyle = this.lineParam.color;
             this.audioCtx.lineWidth = this.lineParam.lineWidth;
             
             let dataArray = new Uint8Array(this.analyser.frequencyBinCount);
@@ -338,6 +348,9 @@ icon-tip()
     .settings-icon-tip {
         icon-tip()
         right 10px
+    }
+    .visualizer-settings {
+        
     }
 }
 </style>
