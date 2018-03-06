@@ -16,7 +16,7 @@ export default {
 </script>
 
 <style lang="less">
-.wrapper{
-  height: 100vh;
+.wrapper {
+  // height: 100vh;
 }
 </style>

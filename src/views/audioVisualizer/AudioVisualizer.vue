@@ -260,9 +260,9 @@ export default {
                 for (let j = 0; j < energy; j++) {
                     let space = energySpace * j;
                     // 上半部分
-                    if (direction != 3)this._drawLine(beginX, endX, baseLine - lineSpace, space, 1);
+                    if (direction != 3) this._drawLine(beginX, endX, baseLine - lineSpace, space, 1);
                     // 下半部分
-                    if (direction != 2)this._drawLine(beginX, endX, baseLine + lineSpace, space, -1);
+                    if (direction != 2) this._drawLine(beginX, endX, baseLine + lineSpace, space, -1);
                 }
             }
         },
